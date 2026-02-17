@@ -1,0 +1,56 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      run: mvn clean package -DskipTests
+
+    - name: Run Tests
+      run: mvn test
+
+    - name: Generate JaCoCo Code Coverage Report
+      run: mvn jacoco:report
+
+    - name: Upload Coverage Report
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./target/site/jacoco/index.html
+        fail_ci_if_error: false
+        verbose: true
+
+    - name: Check Test Results
+      if: failure()
+      run: echo "Tests failed - please check the logs above"
+
+    - name: Archive test reports
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-reports
+        path: target/surefire-reports/
+
+    - name: Archive coverage reports
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-reports
+        path: target/site/jacoco/
+
