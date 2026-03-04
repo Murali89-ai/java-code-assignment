@@ -56,4 +56,17 @@ public class WarehouseRepository implements WarehouseStore, PanacheRepository<Db
     }
     return null;
   }
+
+  public Warehouse findById(String id) {
+    try {
+      Long warehouseId = Long.parseLong(id);
+      DbWarehouse dbWarehouse = findById(warehouseId);
+      if (dbWarehouse != null) {
+        return dbWarehouse.toWarehouse();
+      }
+    } catch (NumberFormatException e) {
+      // Invalid ID format
+    }
+    return null;
+  }
 }

@@ -50,15 +50,11 @@ public class StoreResource {
     return entity;
   }
 
-  @POST
-  @Transactional
-  public Response create(Store store) {
-    if (store.id != null) {
-      throw new WebApplicationException("Id was invalidly set on request.", 422);
-    }
-
-    store.persist();
-
+  /**
+   * Common method to register transaction synchronization callback
+   * that invokes legacy gateway after successful database commit
+   */
+  private void registerLegacyStoreCallback(Store store, LegacyStoreAction action) {
     try {
       transactionManager.getTransaction().registerSynchronization(new Synchronization() {
         @Override
@@ -68,13 +64,29 @@ public class StoreResource {
         public void afterCompletion(int status) {
           // Status 0 = STATUS_COMMITTED, status 1 = STATUS_ROLLEDBACK
           if (status == 0) {
-            legacyStoreManagerGateway.createStoreOnLegacySystem(store);
+            action.execute(legacyStoreManagerGateway, store);
           }
         }
       });
     } catch (Exception e) {
       LOGGER.error("Failed to register transaction synchronization", e);
     }
+  }
+
+  @FunctionalInterface
+  interface LegacyStoreAction {
+    void execute(LegacyStoreManagerGateway gateway, Store store);
+  }
+
+  @POST
+  @Transactional
+  public Response create(Store store) {
+    if (store.id != null) {
+      throw new WebApplicationException("Id was invalidly set on request.", 422);
+    }
+
+    store.persist();
+    registerLegacyStoreCallback(store, LegacyStoreManagerGateway::createStoreOnLegacySystem);
 
     return Response.ok(store).status(201).build();
   }
@@ -96,22 +108,7 @@ public class StoreResource {
     entity.name = updatedStore.name;
     entity.quantityProductsInStock = updatedStore.quantityProductsInStock;
 
-    try {
-      transactionManager.getTransaction().registerSynchronization(new Synchronization() {
-        @Override
-        public void beforeCompletion() {}
-
-        @Override
-        public void afterCompletion(int status) {
-          // Status 0 = STATUS_COMMITTED, status 1 = STATUS_ROLLEDBACK
-          if (status == 0) {
-            legacyStoreManagerGateway.updateStoreOnLegacySystem(updatedStore);
-          }
-        }
-      });
-    } catch (Exception e) {
-      LOGGER.error("Failed to register transaction synchronization", e);
-    }
+    registerLegacyStoreCallback(updatedStore, LegacyStoreManagerGateway::updateStoreOnLegacySystem);
 
     return entity;
   }
@@ -138,22 +135,7 @@ public class StoreResource {
       entity.quantityProductsInStock = updatedStore.quantityProductsInStock;
     }
 
-    try {
-      transactionManager.getTransaction().registerSynchronization(new Synchronization() {
-        @Override
-        public void beforeCompletion() {}
-
-        @Override
-        public void afterCompletion(int status) {
-          // Status 0 = STATUS_COMMITTED, status 1 = STATUS_ROLLEDBACK
-          if (status == 0) {
-            legacyStoreManagerGateway.updateStoreOnLegacySystem(updatedStore);
-          }
-        }
-      });
-    } catch (Exception e) {
-      LOGGER.error("Failed to register transaction synchronization", e);
-    }
+    registerLegacyStoreCallback(updatedStore, LegacyStoreManagerGateway::updateStoreOnLegacySystem);
 
     return entity;
   }

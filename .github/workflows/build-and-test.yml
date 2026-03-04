@@ -28,17 +28,21 @@ jobs:
 
     - name: Generate JaCoCo Code Coverage Report
       run: mvn jacoco:report
+      continue-on-error: true
 
-    - name: Upload Coverage Report
+    - name: Check JaCoCo Coverage
+      run: mvn jacoco:check
+      continue-on-error: true
+
+    - name: Upload JaCoCo Report to Codecov
       uses: codecov/codecov-action@v3
+      if: always()
       with:
-        files: ./target/site/jacoco/index.html
+        files: ./target/site/jacoco/jacoco.xml
+        flags: unittests
+        name: codecov-umbrella
         fail_ci_if_error: false
         verbose: true
-
-    - name: Check Test Results
-      if: failure()
-      run: echo "Tests failed - please check the logs above"
 
     - name: Archive test reports
       if: always()
@@ -46,11 +50,18 @@ jobs:
       with:
         name: test-reports
         path: target/surefire-reports/
+        retention-days: 30
 
-    - name: Archive coverage reports
+    - name: Archive JaCoCo coverage reports
       if: always()
       uses: actions/upload-artifact@v3
       with:
-        name: coverage-reports
+        name: jacoco-report
         path: target/site/jacoco/
+        retention-days: 30
+
+    - name: Upload Coverage Summary
+      if: always()
+      run: |
+        echo "::notice title=Coverage Report::JaCoCo coverage report available in artifacts (jacoco-report)"
 
