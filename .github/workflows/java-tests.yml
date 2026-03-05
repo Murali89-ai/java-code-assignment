@@ -25,19 +25,9 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Run Maven build and tests
-      run: mvn clean test jacoco:report -DskipITs -B
-      continue-on-error: false
-
-    - name: Check if JaCoCo report exists
+    - name: Build and run tests with JaCoCo
       run: |
-        if [ -d "target/site/jacoco/" ]; then
-          echo "JaCoCo report found"
-          ls -la target/site/jacoco/
-        else
-          echo "JaCoCo report NOT found"
-          ls -la target/site/
-        fi
+        mvn clean test jacoco:report -B -DskipITs -ntp
 
     - name: Upload JaCoCo report artifact
       uses: actions/upload-artifact@v4
@@ -45,7 +35,7 @@ jobs:
       with:
         name: jacoco-report
         path: target/site/jacoco/
-        if-no-files-found: warn
+        if-no-files-found: ignore
         retention-days: 30
 
     - name: Upload Surefire test reports artifact
@@ -54,6 +44,6 @@ jobs:
       with:
         name: surefire-reports
         path: target/surefire-reports/
-        if-no-files-found: warn
+        if-no-files-found: ignore
         retention-days: 30
 
