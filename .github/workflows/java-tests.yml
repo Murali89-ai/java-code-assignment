@@ -26,7 +26,7 @@ jobs:
         cache: maven
 
     - name: Run Maven build and tests
-      run: mvn clean test jacoco:report
+      run: mvn clean test jacoco:report -DskipITs -B
       continue-on-error: false
 
     - name: Check if JaCoCo report exists
