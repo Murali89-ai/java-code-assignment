@@ -15,36 +15,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
 
     - name: Set up JDK 17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
 
-    - name: Run tests with Maven
-      run: mvn clean test
+    - name: Run Maven build and tests
+      run: mvn clean test jacoco:report
+      continue-on-error: false
 
-    - name: Generate JaCoCo coverage report
-      run: mvn jacoco:report
-      if: success()
+    - name: Check if JaCoCo report exists
+      run: |
+        if [ -d "target/site/jacoco/" ]; then
+          echo "JaCoCo report found"
+          ls -la target/site/jacoco/
+        else
+          echo "JaCoCo report NOT found"
+          ls -la target/site/
+        fi
 
-    - name: Upload JaCoCo report as artifact
+    - name: Upload JaCoCo report artifact
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: jacoco-report
         path: target/site/jacoco/
+        if-no-files-found: warn
         retention-days: 30
 
-    - name: Upload Surefire reports as artifact
+    - name: Upload Surefire test reports artifact
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: surefire-reports
         path: target/surefire-reports/
+        if-no-files-found: warn
         retention-days: 30
 
