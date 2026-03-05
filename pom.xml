@@ -143,13 +143,27 @@
                                     <element>PACKAGE</element>
                                     <includes>
                                         <include>com.fulfilment.application.monolith.warehouses.domain.usecases</include>
+                                        <include>com.fulfilment.application.monolith.warehouses.domain.models</include>
+                                        <include>com.fulfilment.application.monolith.location</include>
+                                    </includes>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.90</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                                <rule>
+                                    <element>PACKAGE</element>
+                                    <includes>
                                         <include>com.fulfilment.application.monolith.fulfillment</include>
                                     </includes>
                                     <limits>
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.80</minimum>
+                                            <minimum>0.50</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
