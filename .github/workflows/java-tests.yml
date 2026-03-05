@@ -40,7 +40,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Build and run tests with JaCoCo
+    - name: Build and run all tests with JaCoCo
       run: |
         mvn clean test jacoco:report -B -ntp
       continue-on-error: true
