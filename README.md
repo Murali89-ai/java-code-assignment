@@ -2,6 +2,8 @@
 
 This is a short code assignment that explores various aspects of software development, including API implementation, documentation, persistence layer handling, and testing.
 
+> **Status**: ✅ Replace Use Case Implementation Complete with JaCoCo Code Coverage (March 5, 2026)
+
 ## About the assignment
 
 You will find the tasks of this assignment on [CODE_ASSIGNMENT](CODE_ASSIGNMENT.md) file
