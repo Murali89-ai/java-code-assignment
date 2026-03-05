@@ -27,7 +27,7 @@ jobs:
 
     - name: Build and run tests with JaCoCo
       run: |
-        mvn clean test jacoco:report -B -DskipITs -ntp -Dtest=*UseCase*Test,*Gateway*Test
+        mvn clean test jacoco:report -B -ntp
       continue-on-error: true
 
     - name: Upload JaCoCo report artifact
