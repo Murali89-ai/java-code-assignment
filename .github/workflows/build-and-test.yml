@@ -42,7 +42,7 @@ jobs:
 
       - name: Archive JaCoCo coverage reports
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
           path: target/site/jacoco/
@@ -50,7 +50,7 @@ jobs:
 
       - name: Archive test reports
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: surefire-reports
           path: target/surefire-reports/
